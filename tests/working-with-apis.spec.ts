@@ -63,9 +63,9 @@ test('Delete Article', async ({ page, request }) => {
 
   await page.goto('https://conduit.bondaracademy.com/');
   await page.getByText('Sign in').click()
-  await page.getByRole('textbox', {name: "Email"}).fill('jpqa@test.com')
-  await page.getByRole('textbox', {name: "Password"}).fill('Piano123')
-  await page.getByRole('button', {name: "Sign In"}).click()
+  await page.getByRole('textbox', { name: "Email" }).fill('jpqa@test.com')
+  await page.getByRole('textbox', { name: "Password" }).fill('Piano123')
+  await page.getByRole('button', { name: "Sign In" }).click()
 
   await expect(page.locator('.preview-link h1').first()).toContainText('Test Cool Article 30')
   await page.getByText('Test Cool Article 30').click()
@@ -74,4 +74,45 @@ test('Delete Article', async ({ page, request }) => {
   await expect(page.locator('.preview-link h1').first()).not.toContainText('Test Cool Article 30')
 
 })
- 
+
+test('Create Article', async ({ page, request }) => {
+  await page.goto('https://conduit.bondaracademy.com/');
+  await page.getByText('Sign in').click()
+  await page.getByRole('textbox', { name: "Email" }).fill('jpqa@test.com')
+  await page.getByRole('textbox', { name: "Password" }).fill('Piano123')
+  await page.getByRole('button', { name: "Sign In" }).click()
+
+  await page.getByText('New Article').click()
+  await page.getByRole('textbox', { name: "Article Title" }).fill('Enhancing Playwright')
+  await page.getByRole('textbox', { name: "What's this article about?" }).fill('How to improve a Playwright Framewokr')
+  await page.getByRole('textbox', { name: "Write your article (in markdown)" }).fill('Create Cool Automation')
+  await page.getByRole('button', { name: "Publish Article" }).click()
+  const createArticleResponse = await page.waitForResponse('https://conduit-api.bondaracademy.com/api/articles/')
+  const articleResponseJSON = await createArticleResponse.json()
+  const slugId = articleResponseJSON.article.slug
+
+  await expect(page.locator('.article-page h1').first()).toContainText('Enhancing Playwright')
+  await page.getByText('Home').first().click()
+  await expect(page.locator('.preview-link h1').first()).toContainText('Enhancing Playwright')
+
+  const loginResponse = await request.post('https://conduit-api.bondaracademy.com/api/users/login', {
+    data: {
+      "user": {
+        "email": "jpqa@test.com",
+        "password": "Piano123"
+      }
+    }
+  })
+  expect(loginResponse.status()).toEqual(200)
+  const responseJSON = await loginResponse.json()
+  const token = responseJSON.user.token
+
+  const deleteResponse = await request.delete(`https://conduit-api.bondaracademy.com/api/articles/${slugId}`, {
+    headers: {
+      Authorization: `Token ${token}`
+    }
+  })
+
+  expect(deleteResponse.status()).toEqual(204)
+
+})
