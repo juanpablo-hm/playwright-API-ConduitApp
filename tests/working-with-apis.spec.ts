@@ -62,10 +62,6 @@ test('Delete Article', async ({ page, request }) => {
   expect(newArticleResponse.status()).toEqual(201)
 
   await page.goto('https://conduit.bondaracademy.com/');
-  await page.getByText('Sign in').click()
-  await page.getByRole('textbox', { name: "Email" }).fill('jpqa@test.com')
-  await page.getByRole('textbox', { name: "Password" }).fill('Piano123')
-  await page.getByRole('button', { name: "Sign In" }).click()
 
   await expect(page.locator('.preview-link h1').first()).toContainText('Test Cool Article 30')
   await page.getByText('Test Cool Article 30').click()
@@ -77,10 +73,6 @@ test('Delete Article', async ({ page, request }) => {
 
 test('Create Article', async ({ page, request }) => {
   await page.goto('https://conduit.bondaracademy.com/');
-  await page.getByText('Sign in').click()
-  await page.getByRole('textbox', { name: "Email" }).fill('jpqa@test.com')
-  await page.getByRole('textbox', { name: "Password" }).fill('Piano123')
-  await page.getByRole('button', { name: "Sign In" }).click()
 
   await page.getByText('New Article').click()
   await page.getByRole('textbox', { name: "Article Title" }).fill('Enhancing Playwright')
