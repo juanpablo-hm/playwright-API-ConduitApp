@@ -33,17 +33,6 @@ test('Mock and Intercept API Call', async ({ page }) => {
 });
 
 test('Delete Article', async ({ page, request }) => {
-  const loginResponse = await request.post('https://conduit-api.bondaracademy.com/api/users/login', {
-    data: {
-      "user": {
-        "email": "jpqa@test.com",
-        "password": "Piano123"
-      }
-    }
-  })
-  expect(loginResponse.status()).toEqual(200)
-  const responseJSON = await loginResponse.json()
-  const token = responseJSON.user.token
 
   const newArticleResponse = await request.post('https://conduit-api.bondaracademy.com/api/articles/', {
     data: {
@@ -55,8 +44,6 @@ test('Delete Article', async ({ page, request }) => {
           "cool"
         ]
       }
-    }, headers: {
-      Authorization: `Token ${token}`
     }
   })
   expect(newArticleResponse.status()).toEqual(201)
@@ -87,23 +74,7 @@ test('Create Article', async ({ page, request }) => {
   await page.getByText('Home').first().click()
   await expect(page.locator('.preview-link h1').first()).toContainText('Enhancing Playwright')
 
-  const loginResponse = await request.post('https://conduit-api.bondaracademy.com/api/users/login', {
-    data: {
-      "user": {
-        "email": "jpqa@test.com",
-        "password": "Piano123"
-      }
-    }
-  })
-  expect(loginResponse.status()).toEqual(200)
-  const responseJSON = await loginResponse.json()
-  const token = responseJSON.user.token
-
-  const deleteResponse = await request.delete(`https://conduit-api.bondaracademy.com/api/articles/${slugId}`, {
-    headers: {
-      Authorization: `Token ${token}`
-    }
-  })
+  const deleteResponse = await request.delete(`https://conduit-api.bondaracademy.com/api/articles/${slugId}`)
 
   expect(deleteResponse.status()).toEqual(204)
 

@@ -1,23 +1,25 @@
 import { test as setup, expect } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
-import { stringify } from 'querystring';
 
 const authFile = path.join(__dirname, '../playwright/.auth/user.json');
 
 setup('authenticate', async ({ page, request }) => {
-    if (fs.existsSync(authFile)) {
-        const loginResponse = await request.post('https://conduit-api.bondaracademy.com/api/users/login', {
-            data: {
-                "user": {
-                    "email": "jpqa@test.com",
-                    "password": "Piano123"
-                }
+    const loginResponse = await request.post('https://conduit-api.bondaracademy.com/api/users/login', {
+        data: {
+            "user": {
+                "email": "jpqa@test.com",
+                "password": "Piano123"
             }
-        })
-        expect(loginResponse.status()).toEqual(200)
-        const responseJSON = await loginResponse.json()
-        const token = responseJSON.user.token
+        }
+    })
+    expect(loginResponse.status()).toEqual(200)
+    const responseJSON = await loginResponse.json()
+    const token = responseJSON.user.token
+
+    process.env['ACCESS_TOKEN'] = token
+
+    if (fs.existsSync(authFile)) {
 
         const storageStateFile = JSON.parse(fs.readFileSync(authFile, 'utf-8'))
         storageStateFile.origins[0].localStorage[0].value = token
@@ -35,6 +37,5 @@ setup('authenticate', async ({ page, request }) => {
         await page.context().storageState({ path: authFile });
 
     }
-
 
 });
