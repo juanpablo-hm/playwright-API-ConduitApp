@@ -8,8 +8,8 @@ setup('authenticate', async ({ page, request }) => {
     const loginResponse = await request.post('https://conduit-api.bondaracademy.com/api/users/login', {
         data: {
             "user": {
-                "email": "jpqa@test.com",
-                "password": "Piano123"
+                "email": process.env['EMAIL']!,
+                "password": process.env['PASSWORD']!
             }
         }
     })
@@ -28,8 +28,8 @@ setup('authenticate', async ({ page, request }) => {
     } else {
         await page.goto('https://conduit.bondaracademy.com/');
         await page.getByText('Sign in').click()
-        await page.getByRole('textbox', { name: "Email" }).fill('jpqa@test.com')
-        await page.getByRole('textbox', { name: "Password" }).fill('Piano123')
+        await page.getByRole('textbox', { name: "Email" }).fill(process.env['EMAIL']!)
+        await page.getByRole('textbox', { name: "Password" }).fill(process.env['PASSWORD']!)
         await page.getByRole('button', { name: "Sign In" }).click()
 
         await expect(page.getByRole('link', { name: 'New Article' })).toBeVisible();
